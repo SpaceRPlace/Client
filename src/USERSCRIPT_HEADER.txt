@@ -8,11 +8,11 @@
 // @match        https://new.reddit.com/r/place/*
 // @connect      reddit.com
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=reddit.com
-// @updateURL    https://github.com/SpaceRPlace/Userscript/releases/download/latest/placenl-userscript.user.js
-// @downloadURL  https://github.com/SpaceRPlace/Userscript/releases/download/latest/placenl-userscript.user.js
+// @updateURL    https://github.com/SpaceRPlace/Client/releases/download/latest/placenl-userscript.user.js
+// @downloadURL  https://github.com/SpaceRPlace/Client/releases/download/latest/placenl-userscript.user.js
 // ==/UserScript==
 
 /*
  * The code below is a minified, webpacked bundle.
- * The uncompiled source code can be found at https://github.com/SpaceRPlace/Userscript
+ * The uncompiled source code can be found at https://github.com/SpaceRPlace/Client
  */
