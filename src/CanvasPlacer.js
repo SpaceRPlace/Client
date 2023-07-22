@@ -19,7 +19,23 @@ export class CanvasPlacer {
                 this.placing = false;
             }
 
-            if (!this.mayPlace || this.placing) return;
+            let hudText = '';
+            if (client.completion) {
+                const percentageWrong = client.completion.wrong / client.completion.total * 100;
+                const percentageRight = 100 - percentageWrong;
+
+                hudText = `${lang().HUD_PIXELS_CORRECT
+                    .replace('{right}', client.completion.right)
+                    .replace('{total}', client.completion.total)
+                    .replace('{percentage}', percentageRight.toFixed(1))
+                    .replace('{wrong}', client.completion.wrong)
+                }\n`;
+            }
+
+            if (!this.mayPlace || this.placing) {
+                setHUDBody(hudText);
+                return;
+            }
             if (!this.cooldownEndsAt) {
                 if (this.cooldownEndsAt === undefined) {
                     this.cooldownEndsAt = null;
@@ -28,27 +44,36 @@ export class CanvasPlacer {
                         infoNotification(lang().TOAST_PLACE_PIXELS_IN.replace('{time}', new Date(this.cooldownEndsAt).toLocaleTimeString()), null, Math.max(this.cooldownEndsAt - Date.now(), 1000));
                     }
                 }
+                setHUDBody(hudText);
                 return;
             }
 
-            let secondsRemaining = Math.floor((this.cooldownEndsAt - Date.now()) / 1000);
+            let secondsRemaining = Math.floor(Math.max(0, this.cooldownEndsAt - Date.now()) / 1000);
             let minutesRemaining = Math.floor(secondsRemaining / 60);
             secondsRemaining = secondsRemaining % 60;
 
-            setHUDBody(lang().HUD_NEXT_PIXEL_IN.replace('{time}', `${String(minutesRemaining).padStart(2, '0')}:${String(secondsRemaining).padStart(2, '0')}`));
+            hudText += `${lang().HUD_NEXT_PIXEL_IN.replace('{time}', `${String(minutesRemaining).padStart(2, '0')}:${String(secondsRemaining).padStart(2, '0')}`)}\n`;
+
+            setHUDBody(hudText);
             if (this.cooldownEndsAt > Date.now()) return;
 
             this.placing = true;
             this.placingSince = Date.now();
             client.ws.enableCapability('placeNow');
             infoNotification(lang().TOAST_PLACING_PIXEL);
-            setHUDBody('');
             try {
-                const canvases = await getCanvasURLS(client, [1, 4]);
+                const canvases = await getCanvasURLS(client, [0, 1, 2, 3, 4, 5]);
                 client.placeReference.clearRect(0, 0, client.placeReference.canvas.width, client.placeReference.canvas.height);
 
-                await loadURLToCanvas(client.placeReference, canvases[0], 0, -500);
-                await loadURLToCanvas(client.placeReference, canvases[1], 0, 500);
+                // todo: shove in array
+                await Promise.all([
+                    loadURLToCanvas(client.placeReference, canvases[0], 0, 0),
+                    loadURLToCanvas(client.placeReference, canvases[1], 1000, 0),
+                    loadURLToCanvas(client.placeReference, canvases[2], 2000, 0),
+                    loadURLToCanvas(client.placeReference, canvases[3], 0, 1000),
+                    loadURLToCanvas(client.placeReference, canvases[4], 1000, 1000),
+                    loadURLToCanvas(client.placeReference, canvases[5], 2000, 1000)
+                ]);
 
                 const wrongPixels = getIncorrectPixels(client);
                 if (wrongPixels.length !== 0) {
@@ -58,24 +83,24 @@ export class CanvasPlacer {
                         const pi = PALETTE.indexOf(hex.toUpperCase());
                         if (pi === -1) continue;
 
-                        let displayX = pixel[0] + client.orderOffset.x;
-                        let displayY = pixel[1] + client.orderOffset.y;
-                        let canvasX = 0;
-                        let canvasY = 0;
+                        let canvasX = pixel[0];
+                        let canvasY = pixel[1];
                         let canvas = 0;
-                        canvasX = (displayX + 500) % 1000;
-                        canvasY = (displayY + 1000) % 1000;
-                        if (displayY < 0) {
-                            if (displayX < -500) canvas = 0;
-                            else if (displayX > 499) canvas = 2;
+                        if (canvasY < 1000) {
+                            if (canvasX < 1000) canvas = 0;
+                            else if (canvasX >= 2000) canvas = 2;
                             else canvas = 1;
                         } else {
-                            if (displayX < -500) canvas = 3;
-                            else if (displayX > 499) canvas = 5;
+                            if (canvasX < 1000) canvas = 3;
+                            else if (canvasX >= 2000) canvas = 5;
                             else canvas = 4;
                         }
-
+                        let displayX = canvasX - 1500;
+                        let displayY = canvasY - 1000;
+                        canvasX %= 1000;
+                        canvasY %= 1000;
                         infoNotification(lang().TOAST_PLACING_PIXEL_AT.replace('{x}', displayX).replace('{y}', displayY));
+
                         let delay = await placePixel(client, canvasX, canvasY, pi, canvas);
                         if (typeof delay === 'number') {
                             this.cooldownEndsAt = delay;
