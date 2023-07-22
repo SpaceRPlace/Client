@@ -1,15 +1,15 @@
 // ==UserScript==
 // @name         PlaceNL Userscript (Autoupdater)
-// @namespace    https://github.com/PlaceNL/Userscript
+// @namespace    emlynlj.co.uk
 // @version      0.0.2
 // @description  The easiest way to run our automated placer and keep it up to date, right from your browser
-// @author       PlaceNL
+// @author       Emlyn, PlaceNL
 // @match        https://www.reddit.com/r/place/*
 // @match        https://new.reddit.com/r/place/*
 // @connect      reddit.com
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=reddit.com
-// @updateURL    https://github.com/PlaceNL/Userscript/releases/download/latest/placenl-userscript-autoupdater.user.js
-// @downloadURL  https://github.com/PlaceNL/Userscript/releases/download/latest/placenl-userscript-autoupdater.user.js
+// @updateURL    https://github.com/SpaceRPlace/Userscript/releases/download/latest/placenl-userscript-autoupdater.user.js
+// @downloadURL  https://github.com/SpaceRPlace/Userscript/releases/download/latest/placenl-userscript-autoupdater.user.js
 // @grant        GM.xmlHttpRequest
 // @connect      github.com
 // @connect      objects.githubusercontent.com
