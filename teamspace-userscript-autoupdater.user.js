@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         PlaceNL Userscript (Autoupdater)
+// @name         TeamSpace Userscript (Autoupdater)
 // @namespace    emlynlj.co.uk
 // @version      0.0.2
 // @description  The easiest way to run our automated placer and keep it up to date, right from your browser
